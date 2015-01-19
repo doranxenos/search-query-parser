@@ -25,7 +25,6 @@ describe('Search query syntax parser', function () {
     parsedSearchQuery.should.not.have.property('text');
   });
 
-
   it('should parse a single keyword with free text after it', function () {
     var searchQuery = 'from:jul@foo.com hey buddy!';
     var options = {keywords: ['from']};
@@ -200,5 +199,22 @@ describe('Search query syntax parser', function () {
     parsedSearchQuery.to.should.containEql('toto@hey.co');
   });
 
+  it('should handle simple quoted text', function () {
+    var searchQuery = "fancy 'pyjama' \"wear\"";
+    var parsedSearchQuery = searchquery.parse(searchQuery);
+
+    parsedSearchQuery.should.be.a.string;
+    parsedSearchQuery.should.equal(searchQuery);
+  });
+
+  it('should treat quoted text as single field value', function () {
+    var searchQuery = 'from:\"bob and alice\" blah';
+    var options = {keywords: ['from']};
+    var parsedSearchQuery = searchquery.parse(searchQuery, options);
+
+    parsedSearchQuery.should.be.an.Object;
+    parsedSearchQuery.should.have.property('from', 'bob and alice');
+    parsedSearchQuery.should.have.property('text', 'blah');
+  });
 
 });
