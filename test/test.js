@@ -6,15 +6,6 @@ var assert = require('assert')
 describe('Search query syntax parser', function () {
 
 
-  it('should return a simple string when zero keyword present', function () {
-    var searchQuery = "fancy pyjama wear";
-    var parsedSearchQuery = searchquery.parse(searchQuery);
-
-    parsedSearchQuery.should.be.a.string;
-    parsedSearchQuery.should.equal(searchQuery);
-  });
-
-
   it('should parse a single keyword with no text', function () {
     var searchQuery = 'from:jul@foo.com';
     var options = {keywords: ['from']};
@@ -32,7 +23,7 @@ describe('Search query syntax parser', function () {
 
     parsedSearchQuery.should.be.an.Object;
     parsedSearchQuery.should.have.property('from', 'jul@foo.com');
-    parsedSearchQuery.should.have.property('text', 'hey buddy!');
+    parsedSearchQuery.should.have.property('text', ['hey', 'buddy!']);
   });
 
 
@@ -43,7 +34,7 @@ describe('Search query syntax parser', function () {
 
     parsedSearchQuery.should.be.an.Object;
     parsedSearchQuery.should.have.property('from', 'jul@foo.com');
-    parsedSearchQuery.should.have.property('text', 'hey you!');
+    parsedSearchQuery.should.have.property('text', ['hey', 'you!']);
   });
 
 
@@ -54,7 +45,7 @@ describe('Search query syntax parser', function () {
 
     parsedSearchQuery.should.be.an.Object;
     parsedSearchQuery.should.have.property('from', 'jul@foo.com');
-    parsedSearchQuery.should.have.property('text', 'hey you! pouet');
+    parsedSearchQuery.should.have.property('text', ['hey', 'you!', 'pouet']);
   });
 
 
@@ -66,7 +57,7 @@ describe('Search query syntax parser', function () {
 
     parsedSearchQuery.should.be.an.Object;
     parsedSearchQuery.should.have.property('from', 'jul@foo.com');
-    parsedSearchQuery.should.have.property('text', 'hey you! pouet');
+    parsedSearchQuery.should.have.property('text', ['hey', 'you!', 'pouet']);
   });
 
 
@@ -78,7 +69,7 @@ describe('Search query syntax parser', function () {
     parsedSearchQuery.should.be.an.Object;
     parsedSearchQuery.should.have.property('from', 'jul@foo.com');
     parsedSearchQuery.should.have.property('to', 'bar@hey.ya');
-    parsedSearchQuery.should.have.property('text', 'hey, so what\'s up gents');
+    parsedSearchQuery.should.have.property('text', ['hey,', 'so', 'what\'s', 'up', 'gents']);
   });
 
 
@@ -158,8 +149,8 @@ describe('Search query syntax parser', function () {
     var searchQuery = '✓ about 这个事儿';
     var parsedSearchQuery = searchquery.parse(searchQuery);
 
-    parsedSearchQuery.should.be.a.string;
-    parsedSearchQuery.should.be.equal('✓ about 这个事儿');
+    parsedSearchQuery.should.be.an.Object;
+    parsedSearchQuery.should.have.property('text', ['✓', 'about',  '这个事儿']);
   });
 
 
@@ -169,7 +160,7 @@ describe('Search query syntax parser', function () {
     var parsedSearchQuery = searchquery.parse(searchQuery, options);
 
     parsedSearchQuery.should.be.an.Object;
-    parsedSearchQuery.should.have.property('text', '✓ about 这个事儿');
+    parsedSearchQuery.should.have.property('text', ['✓', 'about',  '这个事儿']);
     parsedSearchQuery.should.have.property('from', 'dr@who.co.uk');
   });
 
@@ -180,7 +171,7 @@ describe('Search query syntax parser', function () {
     var parsedSearchQuery = searchquery.parse(searchQuery, options);
 
     parsedSearchQuery.should.be.an.Object;
-    parsedSearchQuery.should.have.property('text', 'ahaha ouch!# about that');
+    parsedSearchQuery.should.have.property('text', ['ahaha', 'ouch!#', 'about', 'that']);
     parsedSearchQuery.should.have.property('date');
     parsedSearchQuery.date.should.be.an.Object;
     parsedSearchQuery.date.from.should.containEql('12/12/2012');
@@ -199,14 +190,6 @@ describe('Search query syntax parser', function () {
     parsedSearchQuery.to.should.containEql('toto@hey.co');
   });
 
-  it('should handle simple quoted text', function () {
-    var searchQuery = "fancy 'pyjama' \"wear\"";
-    var parsedSearchQuery = searchquery.parse(searchQuery);
-
-    parsedSearchQuery.should.be.a.string;
-    parsedSearchQuery.should.equal(searchQuery);
-  });
-
   it('should treat quoted text as single field value', function () {
     var searchQuery = 'from:\"bob and alice\" blah';
     var options = {keywords: ['from']};
@@ -215,6 +198,15 @@ describe('Search query syntax parser', function () {
     parsedSearchQuery.should.be.an.Object;
     parsedSearchQuery.should.have.property('from', 'bob and alice');
     parsedSearchQuery.should.have.property('text', 'blah');
+  });
+
+  it('should treat quoted text as single text value', function () {
+    var searchQuery = '\"bob and alice\" blah';
+    var options = {keywords: ['from']};
+    var parsedSearchQuery = searchquery.parse(searchQuery, options);
+
+    parsedSearchQuery.should.be.an.Object;
+    parsedSearchQuery.should.have.property('text', ['bob and alice', 'blah']);
   });
 
 });
