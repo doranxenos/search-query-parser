@@ -5,7 +5,6 @@ var assert = require('assert')
 
 describe('Search query syntax parser', function () {
 
-
   it('should parse a single keyword with no text', function () {
     var searchQuery = 'from:jul@foo.com';
     var options = {keywords: ['from']};
@@ -132,7 +131,7 @@ describe('Search query syntax parser', function () {
   });
 
   it('should parse range with 2 ends and free text', function () {
-    var searchQuery = 'date:12/12/2012-01/01/2014 ahaha';
+    var searchQuery = 'date:[12/12/2012 TO 01/01/2014] ahaha';
     var options = {ranges: ['date']};
     var parsedSearchQuery = searchquery.parse(searchQuery, options);
 
@@ -143,7 +142,6 @@ describe('Search query syntax parser', function () {
     parsedSearchQuery.date.from.should.containEql('12/12/2012');
     parsedSearchQuery.date.to.should.containEql('01/01/2014');
   });
-
 
   it('should be able to parse unicode', function () {
     var searchQuery = '✓ about 这个事儿';
@@ -166,7 +164,7 @@ describe('Search query syntax parser', function () {
 
 
   it('should handle absurdly complex and long query', function () {
-    var searchQuery = '   date:12/12/2012-01/01/2014 ahaha from:jul@foo.com,bar@hey.ya from:a@b.c,d@e.f ouch!#   to:me@me.com to:toto@hey.co about that';
+    var searchQuery = '   date:[12/12/2012 TO 01/01/2014] ahaha from:jul@foo.com,bar@hey.ya from:a@b.c,d@e.f ouch!#   to:me@me.com to:toto@hey.co about that';
     var options = {ranges: ['date'], keywords: ['from', 'to']};
     var parsedSearchQuery = searchquery.parse(searchQuery, options);
 
@@ -207,6 +205,7 @@ describe('Search query syntax parser', function () {
 
     parsedSearchQuery.should.be.an.Object;
     parsedSearchQuery.should.have.property('text', ['bob and alice', 'blah']);
+
   });
 
 });
